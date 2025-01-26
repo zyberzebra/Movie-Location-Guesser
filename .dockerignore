@@ -3,13 +3,13 @@
 .gitignore
 .gitattributes
 
-# Gradle
+# Gradle - keep wrapper files
 .gradle/
 build/*
 !build/libs/*.jar
-gradle/
-gradlew
-gradlew.bat
+!gradle/wrapper/
+!gradlew
+!gradlew.bat
 
 # IDE files
 .idea/
@@ -67,7 +67,6 @@ docker-compose*
 # Other
 *.class
 *.jar
-!gradle/wrapper/gradle-wrapper.jar
 *.war
 *.ear
 *.zip

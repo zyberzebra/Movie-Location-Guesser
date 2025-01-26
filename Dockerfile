@@ -3,19 +3,11 @@ FROM eclipse-temurin:17-jdk-jammy as builder
 
 WORKDIR /workspace
 
-# Copy Gradle wrapper files first
-COPY gradlew .
-COPY gradle gradle
-COPY build.gradle settings.gradle ./
+# Copy all source files
+COPY . .
 
 # Make Gradle wrapper executable
 RUN chmod +x gradlew
-
-# Download dependencies first (this layer will be cached)
-RUN ./gradlew dependencies --no-daemon
-
-# Copy the rest of the source code
-COPY src src
 
 # Build the application
 RUN ./gradlew bootJar --no-daemon
