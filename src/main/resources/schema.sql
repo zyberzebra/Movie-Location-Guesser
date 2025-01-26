@@ -1,0 +1,6 @@
+CREATE TABLE IF NOT EXISTS movie (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    latitude DOUBLE NOT NULL,
+    longitude DOUBLE NOT NULL
+); 
