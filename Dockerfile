@@ -2,11 +2,23 @@
 FROM eclipse-temurin:17-jdk-jammy as builder
 
 WORKDIR /workspace
-COPY . .
 
-# Build the application (using the Gradle wrapper)
-RUN chmod +x ./gradlew && \
-    ./gradlew bootJar --no-daemon
+# Copy Gradle wrapper files first
+COPY gradlew .
+COPY gradle gradle
+COPY build.gradle settings.gradle ./
+
+# Make Gradle wrapper executable
+RUN chmod +x gradlew
+
+# Download dependencies first (this layer will be cached)
+RUN ./gradlew dependencies --no-daemon
+
+# Copy the rest of the source code
+COPY src src
+
+# Build the application
+RUN ./gradlew bootJar --no-daemon
 
 # Stage 2: Runtime with JRE
 FROM eclipse-temurin:17-jre-jammy
