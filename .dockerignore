@@ -3,13 +3,14 @@
 .gitignore
 .gitattributes
 
-# Gradle - keep wrapper files
-.gradle/
-build/*
-!build/libs/*.jar
-!gradle/wrapper/
+# Gradle - explicitly keep wrapper files
+.gradle
+build/
+!gradle/
 !gradlew
 !gradlew.bat
+!build.gradle
+!settings.gradle
 
 # IDE files
 .idea/
