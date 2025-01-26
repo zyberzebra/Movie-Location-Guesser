@@ -6,7 +6,10 @@
 # Gradle - explicitly keep wrapper files
 .gradle
 build/
-!gradle/
+!build/libs/*.jar
+!gradle/wrapper/
+!gradle/wrapper/gradle-wrapper.jar
+!gradle/wrapper/gradle-wrapper.properties
 !gradlew
 !gradlew.bat
 !build.gradle
