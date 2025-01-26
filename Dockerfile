@@ -1,30 +1,41 @@
-FROM eclipse-temurin:17-jdk-alpine
+# Stage 1: Build with JDK and Gradle
+FROM eclipse-temurin:17-jdk-jammy as builder
 
-# Create a non-root user
-RUN addgroup -S spring && adduser -S spring -G spring
+WORKDIR /workspace
+COPY . .
 
-# Create directories with proper permissions
+# Build the application (using the Gradle wrapper)
+RUN chmod +x ./gradlew && \
+    ./gradlew bootJar --no-daemon
+
+# Stage 2: Runtime with JRE
+FROM eclipse-temurin:17-jre-jammy
+
+# Create non-root user (Debian/Ubuntu syntax)
+RUN groupadd --system spring && \
+    useradd --system --gid spring --shell /bin/false spring
+
+# Create necessary directories with proper permissions
 RUN mkdir -p /app/data && \
     chown -R spring:spring /app
 
-# Set working directory
 WORKDIR /app
 
-# Copy the jar file
-COPY build/libs/*.jar app.jar
+# Copy built JAR and resources from builder stage
+COPY --from=builder --chown=spring:spring /workspace/build/libs/*.jar app.jar
+COPY --from=builder --chown=spring:spring /workspace/src/main/resources/data.sql /app/data/
 
-# Set ownership of the jar file
-RUN chown spring:spring app.jar
+# Create a volume for persistent data
+VOLUME /app/data
 
 # Switch to non-root user
 USER spring
 
-# Set environment variables
+# Environment variables
 ENV PORT=8081
-ENV JAVA_OPTS="-Xmx512m -Xms256m"
+ENV JAVA_OPTS="-Xmx512m -Xms256m -Dserver.port=${PORT} -Dspring.datasource.url=jdbc:sqlite:/app/data/moviedb.sqlite"
 
-# Expose the application port
-EXPOSE 8081
+EXPOSE ${PORT}
 
-# Run the application
-ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"] 
+# Use exec form for better signal handling
+ENTRYPOINT ["sh", "-c", "java ${JAVA_OPTS} -jar app.jar"]
