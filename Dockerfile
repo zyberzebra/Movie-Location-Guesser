@@ -1,15 +1,17 @@
-# Stage 1: Build with JDK and Gradle
-FROM eclipse-temurin:17-jdk-jammy as builder
+FROM eclipse-temurin:17-jdk-jammy AS builder  # Fix casing to match "AS"
 
 WORKDIR /workspace
 
-# Install Gradle
-RUN apt-get update && apt-get install -y gradle
-
+# Copy ALL files including gradle wrapper
 COPY . .
 
-# Build using installed Gradle
-RUN gradle bootJar --no-daemon
+# Make gradlew executable and verify wrapper exists
+RUN chmod +x gradlew && \
+    ls -la && \
+    ls -la gradle/wrapper/
+
+# Build using the wrapper
+RUN ./gradlew bootJar --no-daemon --stacktrace
 
 # Stage 2: Runtime with JRE
 FROM eclipse-temurin:17-jre-jammy
