@@ -3,14 +3,13 @@ FROM eclipse-temurin:17-jdk-jammy as builder
 
 WORKDIR /workspace
 
-# Copy all source files
+# Install Gradle
+RUN apt-get update && apt-get install -y gradle
+
 COPY . .
 
-# Make Gradle wrapper executable
-RUN chmod +x gradlew
-
-# Build the application
-RUN ./gradlew bootJar --no-daemon
+# Build using installed Gradle
+RUN gradle bootJar --no-daemon
 
 # Stage 2: Runtime with JRE
 FROM eclipse-temurin:17-jre-jammy
