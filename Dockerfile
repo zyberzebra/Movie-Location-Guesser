@@ -2,15 +2,17 @@ FROM eclipse-temurin:17-jdk-jammy AS builder
 
 WORKDIR /workspace
 
-# Copy ALL files including gradle wrapper
 COPY . .
 
-# Make gradlew executable and verify wrapper exists
-RUN chmod +x gradlew && \
-    ls -la && \
+# Fix Line Endings & Permissions
+RUN sed -i 's/\r$//' gradlew && \
+    chmod +x gradlew
+
+# Debug: Zeige Dateistruktur
+RUN ls -la && \
     ls -la gradle/wrapper/
 
-# Build using the wrapper
+# Build
 RUN ./gradlew bootJar --no-daemon --stacktrace
 
 # Stage 2: Runtime with JRE
